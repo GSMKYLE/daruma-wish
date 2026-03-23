@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daruma Wish - Enter Wish</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        daruma: {
+                            red: '#E04A3A',
+                            orange: '#F27D42',
+                            cream: '#FDFBF7',
+                            gold: '#F4B942',
+                            dark: '#2D2A26',
+                            paper: '#F5EFE6',
+                            blue: '#2471E7',
+                            green: '#71E07E',
+                            purple: '#B592FF',
+                            softblue: '#95C6FF'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                        display: ['Quicksand', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 8px 30px rgba(224, 74, 58, 0.08)',
+                        'card': '0 4px 20px rgba(0, 0, 0, 0.05)',
+                        'button': '0 6px 0 rgba(193, 56, 43, 1)',
+                        'button-hover': '0 2px 0 rgba(193, 56, 43, 1)',
+                        'chip': '0 4px 12px rgba(0,0,0,0.05)',
+                        'chip-active': '0 0 0 2px #E04A3A, 0 4px 12px rgba(224, 74, 58, 0.2)'
+                    },
+                    backgroundImage: {
+                        'paper-texture': "url('data:image/svg+xml,%3Csvg width=\\'20\\' height=\\'20\\' viewBox=\\'0 0 20 20\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cg fill=\\'%23e04a3a\\' fill-opacity=\\'0.02\\' fill-rule=\\'evenodd\\'%3E%3Ccircle cx=\\'3\\' cy=\\'3\\' r=\\'3\\'/%3E%3Ccircle cx=\\'13\\' cy=\\'13\\' r=\\'3\\'/%3E%3C/g%3E%3C/svg%3E')",
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0E152A;
+            background-image: url('data:image/svg+xml,%3Csvg width=\\'20\\' height=\\'20\\' viewBox=\\'0 0 20 20\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cg fill=\\'%23ffffff\\' fill-opacity=\\'0.02\\' fill-rule=\\'evenodd\\'%3E%3Ccircle cx=\\'3\\' cy=\\'3\\' r=\\'3\\'/%3E%3Ccircle cx=\\'13\\' cy=\\'13\\' r=\\'3\\'/%3E%3C/g%3E%3C/svg%3E');
+        }
+        .btn-press {
+            transition: all 0.1s ease;
+        }
+        .btn-press:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(193, 56, 43, 1);
+        }
+        ::-webkit-scrollbar { display: none; }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .paper-charm {
+            background-color: #FDFBF7;
+            background-image: url('data:image/svg+xml,%3Csvg width=\\'20\\' height=\\'20\\' viewBox=\\'0 0 20 20\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cg fill=\\'%23e04a3a\\' fill-opacity=\\'0.03\\' fill-rule=\\'evenodd\\'%3E%3Ccircle cx=\\'3\\' cy=\\'3\\' r=\\'3\\'/%3E%3Ccircle cx=\\'13\\' cy=\\'13\\' r=\\'3\\'/%3E%3C/g%3E%3C/svg%3E');
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05), 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .paper-charm::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 10px;
+            background: #E04A3A;
+            border-radius: 5px 5px 0 0;
+        }
+
+        /* Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #68D391;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #68D391;
+        }
+    </style>
+</head>
+<body class="text-white antialiased w-full min-h-screen overflow-x-hidden flex justify-center">
+
+    <!-- Mobile Wrapper -->
+    <div class="w-full max-w-[480px] min-h-screen bg-[#0E152A] relative shadow-[0_0_50px_rgba(0,0,0,0.3)] flex flex-col">
+
+        <!-- Navigation -->
+        <nav id="header" class="w-full px-6 pt-12 pb-4 flex justify-between items-center bg-[#0E152A]/90 backdrop-blur-md sticky top-0 z-50 border-b border-white/10">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 rounded-full bg-daruma-red flex items-center justify-center text-white shadow-sm">
+                    <i class="fa-solid fa-yin-yang text-xl"></i>
+                </div>
+                <span class="font-display font-bold text-xl tracking-tight text-white">Daruma Wish</span>
+            </div>
+            <button class="w-10 h-10 rounded-full bg-white/10 shadow-card flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col pb-24 relative overflow-y-auto">
+            
+            <!-- Ambient Background Glows -->
+            <div class="absolute top-20 left-10 w-48 h-48 bg-daruma-red/20 rounded-full blur-[60px] pointer-events-none"></div>
+            <div class="absolute bottom-40 right-10 w-64 h-64 bg-daruma-gold/10 rounded-full blur-[80px] pointer-events-none"></div>
+
+            <!-- Wish Header Section -->
+            <section id="wish-header" class="px-6 pt-8 pb-4 relative z-10 flex items-center gap-4">
+                <button class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div>
+                    <h1 class="font-display font-black text-2xl md:text-3xl leading-tight text-white">
+                        Write Your Wish
+                    </h1>
+                    <p class="text-daruma-softblue text-sm font-medium">Feeling Hopeful <i class="fa-solid fa-sun ml-1"></i></p>
+                </div>
+            </section>
+
+            <!-- Charm Input Section -->
+            <section id="charm-input-section" class="px-6 py-4 relative z-10">
+                <div class="paper-charm rounded-2xl p-6 text-daruma-dark flex flex-col gap-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-display font-bold text-lg text-daruma-red">My Wish</span>
+                        <i class="fa-solid fa-pen-nib text-daruma-red/50"></i>
+                    </div>
+                    
+                    <textarea 
+                        class="w-full bg-transparent border-none outline-none resize-none font-sans text-lg placeholder-daruma-dark/40 min-h-[150px]" 
+                        placeholder="Dear Daruma, I wish for..."
+                        maxlength="280"
+                        id="wish-input"
+                    ></textarea>
+                    
+                    <div class="flex justify-between items-center border-t border-daruma-dark/10 pt-3">
+                        <div class="flex gap-2">
+                            <button class="w-8 h-8 rounded-full bg-daruma-dark/5 flex items-center justify-center text-daruma-dark/50 hover:bg-daruma-dark/10 transition">
+                                <i class="fa-solid fa-face-smile"></i>
+                            </button>
+                            <button class="w-8 h-8 rounded-full bg-daruma-dark/5 flex items-center justify-center text-daruma-dark/50 hover:bg-daruma-dark/10 transition">
+                                <i class="fa-solid fa-image"></i>
+                            </button>
+                        </div>
+                        <span class="text-xs font-bold text-daruma-dark/40" id="char-count">0 / 280</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Category Selector Section -->
+            <section id="category-selector" class="px-6 py-4 relative z-10">
+                <h3 class="font-display font-bold text-white mb-3 text-sm uppercase tracking-wider opacity-80">Category</h3>
+                <div class="flex flex-wrap gap-2">
+                    <button class="px-4 py-2 rounded-full glass-panel border border-daruma-red/50 bg-daruma-red/20 text-white font-bold text-sm transition">
+                        <i class="fa-solid fa-heart mr-1 text-daruma-red"></i> Love
+                    </button>
+                    <button class="px-4 py-2 rounded-full glass-panel text-white font-bold text-sm hover:bg-white/10 transition">
+                        <i class="fa-solid fa-briefcase mr-1 text-daruma-gold"></i> Work
+                    </button>
+                    <button class="px-4 py-2 rounded-full glass-panel text-white font-bold text-sm hover:bg-white/10 transition">
+                        <i class="fa-solid fa-leaf mr-1 text-daruma-green"></i> Health
+                    </button>
+                    <button class="px-4 py-2 rounded-full glass-panel text-white font-bold text-sm hover:bg-white/10 transition">
+                        <i class="fa-solid fa-graduation-cap mr-1 text-daruma-blue"></i> Study
+                    </button>
+                </div>
+            </section>
+
+            <!-- Ritual Settings Section -->
+            <section id="ritual-settings" class="px-6 py-4 relative z-10">
+                <div class="glass-panel rounded-2xl p-5 flex flex-col gap-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="font-display font-bold text-white text-lg">Privacy</h4>
+                            <p class="text-xs text-white/60 mt-1 max-w-[200px]">Keep private or share to community wall after the ritual.</p>
+                        </div>
+                        
+                        <!-- Toggle -->
+                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="toggle" id="toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300"/>
+                            <label for="toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-colors duration-300"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-daruma-blue/10 border border-daruma-blue/20 rounded-xl p-3 flex gap-3 items-start mt-2">
+                        <i class="fa-solid fa-circle-info text-daruma-softblue mt-0.5"></i>
+                        <p class="text-xs text-white/80 leading-relaxed">
+                            Our community is a safe space. All shared wishes remain anonymous. Please be kind and respectful.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Illustration Area -->
+            <section id="illustration-area" class="px-6 py-6 flex justify-center relative z-10 opacity-50">
+                <img class="w-32 h-32 object-contain" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/7c6fffb69c-f8fd6e57de75107c305d.png" alt="A cute 3D illustration of a blank Daruma doll waiting to have its eye painted, soft lighting, Japanese aesthetic, isolated on transparent background" />
+            </section>
+
+            <!-- Action Footer -->
+            <section id="action-footer" class="px-6 py-4 mt-auto relative z-10">
+                <button class="btn-press w-full bg-daruma-red text-white font-display font-bold text-lg py-4 rounded-2xl shadow-[0_6px_0_#C1382B] flex items-center justify-center gap-2 hover:bg-[#D03A2A] transition-colors">
+                    <i class="fa-solid fa-paintbrush"></i>
+                    <span>Begin Ritual</span>
+                </button>
+            </section>
+
+        </main>
+
+        <!-- Bottom Navigation Bar -->
+        <nav id="bottom-nav" class="fixed bottom-0 w-full max-w-[480px] bg-[#0E152A] border-t border-white/10 pb-safe pt-2 px-6 flex justify-between items-center z-50 rounded-t-3xl">
+            <a href="#" class="flex flex-col items-center p-2 text-daruma-red">
+                <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-1">
+                    <i class="fa-solid fa-house text-xl"></i>
+                </div>
+                <span class="text-[10px] font-bold">Home</span>
+            </a>
+            <a href="#" class="flex flex-col items-center p-2 text-gray-400 hover:text-white transition-colors">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center mb-1">
+                    <i class="fa-solid fa-earth-americas text-xl"></i>
+                </div>
+                <span class="text-[10px] font-bold">Community</span>
+            </a>
+            <a href="#" class="flex flex-col items-center p-2 text-gray-400 hover:text-white transition-colors">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center mb-1">
+                    <i class="fa-solid fa-book-bookmark text-xl"></i>
+                </div>
+                <span class="text-[10px] font-bold">Archive</span>
+            </a>
+            <a href="#" class="flex flex-col items-center p-2 text-gray-400 hover:text-white transition-colors">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center mb-1">
+                    <i class="fa-solid fa-user text-xl"></i>
+                </div>
+                <span class="text-[10px] font-bold">Profile</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <script>
+        // Character count logic
+        const wishInput = document.getElementById('wish-input');
+        const charCount = document.getElementById('char-count');
+        
+        wishInput.addEventListener('input', function() {
+            const currentLength = this.value.length;
+            charCount.textContent = `${currentLength} / 280`;
+            
+            if(currentLength > 250) {
+                charCount.classList.add('text-daruma-red');
+            } else {
+                charCount.classList.remove('text-daruma-red');
+            }
+        });
+    </script>
+</body>
+</html>

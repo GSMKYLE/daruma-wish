@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Daruma Wish
 
-## Getting Started
+Daruma Wish is a cute, emotionally supportive web app where users come when they feel sad, stressed, lost, or hopeful. They choose a mood, write a wish, complete a Daruma ritual by filling the blank eye, and receive a positive result card.
 
-First, run the development server:
+This project was converted from a static HTML/CSS prototype into a production-ready React application using Next.js 14, Tailwind CSS, Zustand, and Supabase.
+
+## Tech Stack
+
+- **Framework:** Next.js 14+ (App Router)
+- **UI Library:** React
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **State Management:** Zustand
+- **Database/Auth:** Supabase
+- **Icons:** Font Awesome (via CDN in `globals.css` / matching prototype)
+
+## Setup Instructions
+
+### 1. Install Dependencies
+
+```bash
+npm install
+# or
+pnpm install
+# or
+yarn install
+```
+
+### 2. Set up Environment Variables
+
+Create a `.env.local` file in the root directory by copying the `.env.example` file:
+
+```bash
+cp .env.example .env.local
+```
+
+Fill in your Supabase credentials in `.env.local`:
+- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anon key
+
+### 3. Database Setup (Supabase)
+
+1. Create a new Supabase project.
+2. Go to the SQL Editor in your Supabase dashboard.
+3. Copy the contents of `supabase/schema.sql` and run the query to set up the necessary tables, relationships, and Row Level Security (RLS) policies.
+
+### 4. Run the Development Server
 
 ```bash
 npm run dev
 # or
-yarn dev
-# or
 pnpm dev
 # or
-bun dev
+yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the app. Note that the app is designed with a mobile-first approach and is best viewed at a max width of 480px.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Implementation Notes: Mock vs Real Data
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Currently, the UI is fully built out, but the application relies partially on mock data and local state to demonstrate the flow.
 
-## Learn More
+### **Implemented with Real State/Logic (Zustand & Local Logic)**
+- **Routing:** Full Next.js App Router implementation.
+- **Mood Selection:** Selected mood is saved to Zustand store and persists across the flow.
+- **Wish Creation:** Wish draft, category, and privacy toggles are managed via Zustand.
+- **Ritual Interaction:** The press-and-hold interaction is fully implemented using React hooks (`useRef`, `setInterval`) to track progress and update the UI dynamically.
+- **Affirmations:** A local utility (`src/utils/affirmations.ts`) generates contextual affirmations based on the user's selected mood after the ritual is completed.
 
-To learn more about Next.js, take a look at the following resources:
+### **Implemented with Mock Data (Ready for Supabase Integration)**
+- **Authentication:** Currently bypasses strict auth. The app flow works without logging in. Supabase auth is configured in the schema but not yet enforced on the frontend.
+- **Wishes Persistence:** Saving a wish currently relies on Zustand. It needs to be wired up to the `supabase.from('wishes').insert(...)` call in `src/app/ritual/[wishId]/page.tsx` or `wish/new/page.tsx`.
+- **Community Wall:** The `/community` page uses hardcoded `mockPosts` to display the feed.
+- **Personal Archive:** The `/archive` page uses hardcoded `mockWishes` to display the user's past wishes.
+- **Reactions:** The reaction counters on the community wall are static mock data.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Recommended Next Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Connect Supabase APIs:** Replace the mock data arrays in `/community` and `/archive` with actual `supabase.from('...').select()` calls.
+2. **User Authentication:** Implement a magic link or OAuth sign-in flow on the Home page, storing the user session in Zustand or React Context.
+3. **Framer Motion Animations:** While CSS animations handle the basics, integrating `framer-motion` for page transitions (e.g., sliding between steps) will make the flow feel even more seamless.
+4. **Form Validation:** Integrate `react-hook-form` and `zod` in `src/app/wish/new/page.tsx` to handle complex validation gracefully.
+5. **Real-time Reactions:** Use Supabase Realtime subscriptions to update reaction counts live on the Community Wall.
