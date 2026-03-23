@@ -78,18 +78,20 @@ export default function WishResultPage(props: { params: Promise<{ wishId: string
   const [isPosting, setIsPosting] = useState(false);
 
   const handlePostToCommunity = async () => {
-    // 移除嚴格的 ID 檢查，允許草稿狀態發佈
     if (isPosting) return;
     setIsPosting(true);
 
     try {
+      // 確保 wish_id 是有效的 UUID，否則設為 null
+      const isValidUUID = wishIdState && wishIdState.length === 36 && wishIdState.includes('-'); // 簡單判斷，如果是我們自己產生的 draft-xxx 就不算
+      const finalWishId = isValidUUID ? wishIdState : null;
+
       // 在這個簡單的 MVP 版本中，我們只寫入 community_posts 表，不強制關聯 wishes 表
-      // 這樣可以避免因為 foreign key 限制導致的發佈失敗
       const { error } = await supabase
         .from('community_posts')
         .insert([
           {
-            wish_id: wishIdState === 'unknown' ? null : wishIdState, // 如果沒有真實 ID 就傳 null
+            wish_id: finalWishId,
             mood: selectedMood || 'Hopeful',
             content_preview: draftWish || 'To find peace in the present moment...',
             reaction_count: 0
@@ -102,7 +104,7 @@ export default function WishResultPage(props: { params: Promise<{ wishId: string
       }
 
       // 嘗試更新 wishes 表，如果失敗我們也不阻擋流程 (因為用戶可能沒登入或這只是一個草稿心願)
-      if (wishIdState && wishIdState !== 'unknown') {
+      if (wishIdState && wishIdState !== 'unknown' && wishIdState.length > 10) { // 簡單檢查是否為有效的 UUID
         try {
           await supabase
             .from('wishes')
