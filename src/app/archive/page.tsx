@@ -120,7 +120,11 @@ export default function ArchivePage() {
 
   const handleFulfill = async (wishId: string) => {
     try {
-      // Update local state
+      // 記錄原本的狀態，以便失敗時可以復原
+      const originalWishes = [...wishes];
+      const originalSelected = selectedWish ? { ...selectedWish } : null;
+
+      // Update local state (Optimistic UI update)
       setWishes(wishes.map(w => w.id === wishId ? { ...w, fulfilled: true } : w));
       if (selectedWish && selectedWish.id === wishId) {
         setSelectedWish({ ...selectedWish, fulfilled: true });
@@ -129,12 +133,21 @@ export default function ArchivePage() {
       // Update Supabase
       const { error } = await supabase
         .from('wishes')
-        .update({ fulfilled: true })
+        .update({ fulfilled: true, completed_at: new Date().toISOString() })
         .eq('id', wishId);
 
-      if (error) throw error;
+      if (error) {
+        // 如果發生錯誤，復原狀態並拋出錯誤
+        setWishes(originalWishes);
+        setSelectedWish(originalSelected);
+        throw error;
+      }
+      
+      // 成功提示 (可選)
+      alert("恭喜！心願已圓滿。 / Congratulations! Your wish has been fulfilled.");
     } catch (error) {
       console.error('Error fulfilling wish:', error);
+      alert("更新失敗，請稍後再試。 / Failed to update. Please try again.");
       fetchWishes();
     }
   };
