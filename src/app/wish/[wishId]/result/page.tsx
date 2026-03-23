@@ -8,7 +8,23 @@ import html2canvas from "html2canvas";
 import BottomNav from "@/components/BottomNav";
 import { generateAffirmation } from "@/utils/affirmations";
 
-export default function WishResultPage() {
+import { supabase } from "@/lib/supabase";
+
+export default function WishResultPage(props: { params: Promise<{ wishId: string }> | { wishId: string } }) {
+  // Safe extraction for both Next.js 14 and 15
+  const [wishIdState, setWishIdState] = useState<string>("unknown");
+
+  useEffect(() => {
+    if (props.params instanceof Promise) {
+      props.params.then(p => setWishIdState(p.wishId)).catch(() => {});
+    } else {
+      setWishIdState(props.params?.wishId || "unknown");
+    }
+  }, [props.params]);
+  
+  // Disable warning for unused variable
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _unused = wishIdState;
   const router = useRouter();
   const { selectedMood, draftWish } = useAppStore();
   const cardRef = useRef<HTMLDivElement>(null);
@@ -59,10 +75,52 @@ export default function WishResultPage() {
     }
   };
 
-  const handlePostToCommunity = () => {
-    // In a real app, this would make an API call to save the post to the community wall database
-    alert("Your wish has been anonymously posted to the Community Wall!");
-    router.push('/community');
+  const [isPosting, setIsPosting] = useState(false);
+
+  const handlePostToCommunity = async () => {
+    // 移除嚴格的 ID 檢查，允許草稿狀態發佈
+    if (isPosting) return;
+    setIsPosting(true);
+
+    try {
+      // 在這個簡單的 MVP 版本中，我們只寫入 community_posts 表，不強制關聯 wishes 表
+      // 這樣可以避免因為 foreign key 限制導致的發佈失敗
+      const { error } = await supabase
+        .from('community_posts')
+        .insert([
+          {
+            wish_id: wishIdState === 'unknown' ? null : wishIdState, // 如果沒有真實 ID 就傳 null
+            mood: selectedMood || 'Hopeful',
+            content_preview: draftWish || 'To find peace in the present moment...',
+            reaction_count: 0
+          }
+        ]);
+
+      if (error) {
+        console.error("Supabase insert error:", error);
+        throw error;
+      }
+
+      // 嘗試更新 wishes 表，如果失敗我們也不阻擋流程 (因為用戶可能沒登入或這只是一個草稿心願)
+      if (wishIdState && wishIdState !== 'unknown') {
+        try {
+          await supabase
+            .from('wishes')
+            .update({ is_shared: true, is_private: false })
+            .eq('id', wishIdState);
+        } catch (updateErr) {
+          console.warn("Could not update wish status, but community post was created:", updateErr);
+        }
+      }
+
+      alert("Your wish has been anonymously posted to the Community Wall!");
+      router.push('/community');
+    } catch (err) {
+      console.error("Error posting to community:", err);
+      alert("Failed to post. Please try again later.");
+    } finally {
+      setIsPosting(false);
+    }
   };
 
   useEffect(() => {
@@ -223,10 +281,20 @@ export default function WishResultPage() {
 
           <button 
             onClick={handlePostToCommunity}
-            className="btn-press w-full bg-gradient-to-r from-daruma-purple to-purple-700 text-white font-display font-bold text-base py-4 rounded-2xl shadow-button flex items-center justify-center gap-2 hover:from-purple-600 hover:to-purple-800 transition-all mt-2"
+            disabled={isPosting}
+            className={`btn-press w-full bg-gradient-to-r from-daruma-purple to-purple-700 text-white font-display font-bold text-base py-4 rounded-2xl shadow-button flex items-center justify-center gap-2 hover:from-purple-600 hover:to-purple-800 transition-all mt-2 ${isPosting ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            <i className="fa-solid fa-earth-americas"></i>
-            <span>Post to Community Wall</span>
+            {isPosting ? (
+              <>
+                <i className="fa-solid fa-circle-notch fa-spin"></i>
+                <span>Posting...</span>
+              </>
+            ) : (
+              <>
+                <i className="fa-solid fa-earth-americas"></i>
+                <span>Post to Community Wall</span>
+              </>
+            )}
           </button>
 
           <button 
