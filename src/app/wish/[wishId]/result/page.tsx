@@ -86,33 +86,57 @@ export default function WishResultPage(props: { params: Promise<{ wishId: string
       const isValidUUID = wishIdState && wishIdState.length === 36 && wishIdState.includes('-'); // 簡單判斷，如果是我們自己產生的 draft-xxx 就不算
       const finalWishId = isValidUUID ? wishIdState : null;
 
-      // 在這個簡單的 MVP 版本中，我們只寫入 community_posts 表，不強制關聯 wishes 表
-      const { error } = await supabase
+      let newWishId = finalWishId;
+
+      // 如果這是一個全新的心願 (draft)，我們在發佈時順便把它寫入 wishes 表中
+      // 這樣它才會出現在 Archive 中！
+      if (!isValidUUID && draftWish) {
+        const { data: newWishData, error: wishError } = await supabase
+          .from('wishes')
+          .insert([
+            {
+              content: draftWish,
+              mood: selectedMood || 'Hopeful',
+              category: 'General', // 預設值，因為 result 頁面目前沒有存 category
+              is_private: false,
+              is_shared: true,
+              fulfilled: false
+            }
+          ])
+          .select('id')
+          .single();
+
+        if (wishError) {
+          console.error("Error saving to wishes table:", wishError);
+        } else if (newWishData) {
+          newWishId = newWishData.id;
+        }
+      } else if (finalWishId) {
+        // 如果是已存在的心願，就更新狀態
+        try {
+          await supabase
+            .from('wishes')
+            .update({ is_shared: true, is_private: false })
+            .eq('id', finalWishId);
+        } catch (updateErr) {
+          console.warn("Could not update wish status:", updateErr);
+        }
+      }
+
+      // 接著寫入 community_posts 表
+      const { error: postError } = await supabase
         .from('community_posts')
         .insert([
           {
-            wish_id: finalWishId,
+            wish_id: newWishId, // 使用新產生的真實 ID，或原本的 ID，或 null
             mood: selectedMood || 'Hopeful',
             content_preview: draftWish || 'To find peace in the present moment...',
             reaction_count: 0
           }
         ]);
 
-      if (error) {
-        console.error("Supabase insert error:", error);
-        throw error;
-      }
-
-      // 嘗試更新 wishes 表，如果失敗我們也不阻擋流程 (因為用戶可能沒登入或這只是一個草稿心願)
-      if (wishIdState && wishIdState !== 'unknown' && wishIdState.length > 10) { // 簡單檢查是否為有效的 UUID
-        try {
-          await supabase
-            .from('wishes')
-            .update({ is_shared: true, is_private: false })
-            .eq('id', wishIdState);
-        } catch (updateErr) {
-          console.warn("Could not update wish status, but community post was created:", updateErr);
-        }
+      if (postError) {
+        throw postError;
       }
 
       alert("Your wish has been anonymously posted to the Community Wall!");
